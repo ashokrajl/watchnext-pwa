@@ -35,7 +35,7 @@ function showLoading(on=true){ els.loading.classList.toggle('hidden', !on); }
 function showError(msg){ els.error.textContent=msg; els.error.classList.toggle('hidden', !msg); }
 
 async function fetchGenres() {
-  const r = await fetch(`${API_BASE}/genres`);
+  const r = await fetch(`${API_BASE}/?mode=genres);
   if (!r.ok) throw new Error('Genres fetch failed');
   const { genres } = await r.json();
   state.genres = genres;
@@ -58,7 +58,7 @@ async function fetchMovies() {
   if (state.selectedGenres.size) {
     params.set('genres', [...state.selectedGenres].join(','));
   }
-  const r = await fetch(`${API_BASE}/discover?${params}`);
+  const r = await fetch(`${API_BASE}/d?mode=discover&params}`);
   if (!r.ok) throw new Error('Movie fetch failed');
   return r.json();
 }

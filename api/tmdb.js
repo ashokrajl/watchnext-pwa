@@ -1,4 +1,4 @@
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   const { pathname, searchParams } = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
   const mode = searchParams.get('mode') || 'discover';
   const isGenresRequest = mode === 'genres' || pathname.endsWith('/genres');

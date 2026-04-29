@@ -2,11 +2,11 @@ import { useState } from 'react';
 import { SafeAreaView } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 
-import { AppHeader } from './src/components/AppHeader';
-import { AppMenu } from './src/components/AppMenu';
-import { BrowseScreen } from './src/components/BrowseScreen';
-import { GenrePicker } from './src/components/GenrePicker';
-import { ToWatchScreen } from './src/components/ToWatchScreen';
+import { AppHeader } from './src/components/AppHeader.jsx';
+import { AppMenu } from './src/components/AppMenu.jsx';
+import { BrowseScreen } from './src/components/BrowseScreen.jsx';
+import { GenrePicker } from './src/components/GenrePicker.jsx';
+import { ToWatchScreen } from './src/components/ToWatchScreen.jsx';
 import { useCardFlips } from './src/hooks/useCardFlips';
 import { useMovieBrowser } from './src/hooks/useMovieBrowser';
 import { useMovieLists } from './src/hooks/useMovieLists';

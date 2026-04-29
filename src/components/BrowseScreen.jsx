@@ -1,8 +1,8 @@
 import { ActivityIndicator, FlatList, Pressable, Text, View } from 'react-native';
 
 import { styles } from '../styles';
-import { FilterPanel } from './FilterPanel';
-import { MovieCard } from './MovieCard';
+import { FilterPanel } from './FilterPanel.jsx';
+import { MovieCard } from './MovieCard.jsx';
 
 export function BrowseScreen({
   screen,

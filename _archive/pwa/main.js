@@ -6,6 +6,8 @@ const els = {
   genres: document.getElementById('genres'),
   yearFrom: document.getElementById('yearFrom'),
   yearTo: document.getElementById('yearTo'),
+  ratingMin: document.getElementById('ratingMin'),
+  ratingMax: document.getElementById('ratingMax'),
   apply: document.getElementById('apply'),
   loadMore: document.getElementById('loadMore'),
   clearSeen: document.getElementById('clearSeen'),
@@ -20,6 +22,8 @@ let state = {
   selectedGenres: new Set(),
   yearFrom: 2023,
   yearTo: new Date().getFullYear(),
+  ratingMin: 6,
+  ratingMax: 10,
   seen: new Set(loadSeen()),
 };
 
@@ -55,6 +59,8 @@ async function fetchMovies() {
     from: `${state.yearFrom}-01-01`,
     to: `${state.yearTo}-12-31`,
   });
+  if (typeof state.ratingMin === 'number') params.set('ratingMin', String(state.ratingMin));
+  if (typeof state.ratingMax === 'number') params.set('ratingMax', String(state.ratingMax));
   if (state.selectedGenres.size) {
     params.set('genres', [...state.selectedGenres].join(','));
   }
@@ -122,6 +128,16 @@ async function loadNextPage() {
 function applyFilters() {
   state.yearFrom = parseInt(els.yearFrom.value, 10) || state.yearFrom;
   state.yearTo   = parseInt(els.yearTo.value, 10) || state.yearTo;
+  const min = parseFloat(els.ratingMin.value);
+  const max = parseFloat(els.ratingMax.value);
+  if (!Number.isNaN(min)) state.ratingMin = Math.max(0, Math.min(10, min));
+  if (!Number.isNaN(max)) state.ratingMax = Math.max(0, Math.min(10, max));
+  if (state.ratingMin > state.ratingMax) {
+    // swap to keep a valid range
+    const t = state.ratingMin; state.ratingMin = state.ratingMax; state.ratingMax = t;
+    els.ratingMin.value = String(state.ratingMin);
+    els.ratingMax.value = String(state.ratingMax);
+  }
   state.selectedGenres = new Set([...els.genres.selectedOptions].map(o => parseInt(o.value,10)));
   state.page = 1; state.totalPages = 999;
   els.grid.innerHTML = '';

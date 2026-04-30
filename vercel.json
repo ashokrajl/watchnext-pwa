@@ -15,10 +15,6 @@
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
-    },
-    {
       "src": "/(.*\\.(?:js|css|ico|png|jpg|jpeg|svg|json|webmanifest))",
       "dest": "/$1"
     },

@@ -55,7 +55,7 @@ export function useMovieBrowser({ screen, seen, rejected, toWatch, setError }) {
     .join(', ');
 
   const fetchGenres = useCallback(async () => {
-    const res = await fetchWithTimeout(`${API_BASE}/genres`);
+    const res = await fetchWithTimeout(`${API_BASE}?mode=genres`);
     if (!res.ok) throw new Error('Genres fetch failed');
     const data = await res.json();
     setGenres(data.genres || []);
@@ -82,7 +82,8 @@ export function useMovieBrowser({ screen, seen, rejected, toWatch, setError }) {
       if (selectedGenres.length) params.set('genres', selectedGenres.join(','));
     }
 
-    const res = await fetchWithTimeout(`${API_BASE}/discover?${params.toString()}`);
+    params.set('mode', 'discover');
+    const res = await fetchWithTimeout(`${API_BASE}?${params.toString()}`);
     if (!res.ok) throw new Error('Movie fetch failed');
     return res.json();
   }, [ratingMax, ratingMin, screen, selectedGenres, yearFrom, yearTo]);

@@ -14,6 +14,15 @@ export function MovieCard({
   onMarkRejected,
   onAddToWatch,
 }) {
+  const frontOpacity = flipValue.interpolate({
+    inputRange: [0, 0.49, 0.5, 1],
+    outputRange: [1, 1, 0, 0],
+  });
+  const backOpacity = flipValue.interpolate({
+    inputRange: [0, 0.49, 0.5, 1],
+    outputRange: [0, 0, 1, 1],
+  });
+
   return (
     <View style={styles.card}>
       <View style={styles.cardFlipContainer}>
@@ -23,6 +32,7 @@ export function MovieCard({
             styles.cardFace,
             styles.cardFrontFace,
             {
+              opacity: frontOpacity,
               transform: [
                 { perspective: 1000 },
                 {
@@ -58,6 +68,7 @@ export function MovieCard({
             styles.cardFace,
             styles.cardBackFace,
             {
+              opacity: backOpacity,
               transform: [
                 { perspective: 1000 },
                 {

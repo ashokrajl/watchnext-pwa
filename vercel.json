@@ -19,6 +19,10 @@
       "dest": "/api/tmdb.js"
     },
     {
+      "src": "/api/tmdb/(.*)",
+      "dest": "/api/tmdb.js"
+    },
+    {
       "src": "/(.*\\.(?:js|css|ico|png|jpg|jpeg|svg|json|webmanifest))",
       "dest": "/$1"
     },

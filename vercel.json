@@ -16,7 +16,7 @@
   "routes": [
     {
       "src": "/api/tmdb",
-      "dest": "/api/tmdb"
+      "dest": "/api/tmdb.js"
     },
     {
       "src": "/(.*\\.(?:js|css|ico|png|jpg|jpeg|svg|json|webmanifest))",

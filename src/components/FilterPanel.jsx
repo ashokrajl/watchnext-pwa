@@ -1,5 +1,3 @@
-import { Pressable, Text, TextInput, View } from 'react-native';
-
 import { styles } from '../styles';
 
 export function FilterPanel({
@@ -17,28 +15,26 @@ export function FilterPanel({
   onClearSeen,
 }) {
   return (
-    <View style={styles.filters}>
-      <View style={styles.row}>
-        <TextInput value={yearFrom} onChangeText={onYearFromChange} style={styles.input} placeholder="Year from" placeholderTextColor="#94a3b8" keyboardType="number-pad" />
-        <TextInput value={yearTo} onChangeText={onYearToChange} style={styles.input} placeholder="Year to" placeholderTextColor="#94a3b8" keyboardType="number-pad" />
-      </View>
-      <View style={styles.row}>
-        <TextInput value={ratingMin} onChangeText={onRatingMinChange} style={styles.input} placeholder="Rating min" placeholderTextColor="#94a3b8" keyboardType="decimal-pad" />
-        <TextInput value={ratingMax} onChangeText={onRatingMaxChange} style={styles.input} placeholder="Rating max" placeholderTextColor="#94a3b8" keyboardType="decimal-pad" />
-      </View>
-      <Pressable style={styles.genreButton} onPress={onOpenGenres}>
-        <Text style={styles.genreButtonText} numberOfLines={1}>
-          {selectedGenreNames || 'Select genres'}
-        </Text>
-      </Pressable>
-      <View style={styles.row}>
-        <Pressable style={styles.button} onPress={onApply}>
-          <Text style={styles.buttonText}>Apply</Text>
-        </Pressable>
-        <Pressable style={styles.ghostButton} onPress={onClearSeen}>
-          <Text style={styles.ghostButtonText}>Clear Hidden</Text>
-        </Pressable>
-      </View>
-    </View>
+    <div style={styles.filters}>
+      <div style={styles.row}>
+        <input value={yearFrom} onChange={(e) => onYearFromChange(e.target.value)} style={styles.input} placeholder="Year from" inputMode="numeric" />
+        <input value={yearTo} onChange={(e) => onYearToChange(e.target.value)} style={styles.input} placeholder="Year to" inputMode="numeric" />
+      </div>
+      <div style={styles.row}>
+        <input value={ratingMin} onChange={(e) => onRatingMinChange(e.target.value)} style={styles.input} placeholder="Rating min" inputMode="decimal" />
+        <input value={ratingMax} onChange={(e) => onRatingMaxChange(e.target.value)} style={styles.input} placeholder="Rating max" inputMode="decimal" />
+      </div>
+      <button style={styles.genreButton} onClick={onOpenGenres}>
+        <span style={styles.genreButtonText}>{selectedGenreNames || 'Select genres'}</span>
+      </button>
+      <div style={styles.row}>
+        <button style={styles.button} onClick={onApply}>
+          <span style={styles.buttonText}>Apply</span>
+        </button>
+        <button style={styles.ghostButton} onClick={onClearSeen}>
+          <span style={styles.ghostButtonText}>Clear Hidden</span>
+        </button>
+      </div>
+    </div>
   );
 }

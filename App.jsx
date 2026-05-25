@@ -1,6 +1,4 @@
 import { useState } from 'react';
-import { SafeAreaView } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
 
 import { AppHeader } from './src/components/AppHeader.jsx';
 import { AppMenu } from './src/components/AppMenu.jsx';
@@ -38,8 +36,7 @@ export default function App() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar style="light" />
+    <div style={styles.container}>
       <AppHeader
         screen={screen}
         onToggleFilters={() => setFiltersOpen((prev) => !prev)}
@@ -68,7 +65,6 @@ export default function App() {
             applyFilters: browser.applyFilters,
           }}
           flippedCards={cardFlips.flippedCards}
-          getFlipValue={cardFlips.getFlipValue}
           onOpenGenres={() => setGenrePickerOpen(true)}
           onClearSeen={movieLists.clearSeen}
           onLoadNextPage={browser.loadNextPage}
@@ -98,6 +94,6 @@ export default function App() {
         onToggleGenre={browser.toggleGenre}
         onClose={() => setGenrePickerOpen(false)}
       />
-    </SafeAreaView>
+    </div>
   );
 }

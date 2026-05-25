@@ -1,5 +1,3 @@
-import { Pressable, Text, View } from 'react-native';
-
 import { styles } from '../styles';
 
 const TITLES = {
@@ -18,21 +16,21 @@ const SUBTITLES = {
 
 export function AppHeader({ screen, onToggleFilters, onOpenMenu }) {
   return (
-    <View style={styles.header}>
-      <View style={styles.headerLeft}>
-        <Text style={styles.title}>{TITLES[screen]}</Text>
-        <Text style={styles.subtitle}>{SUBTITLES[screen]}</Text>
-      </View>
-      <View style={styles.headerActions}>
+    <div style={styles.header}>
+      <div style={styles.headerLeft}>
+        <p style={styles.title}>{TITLES[screen]}</p>
+        <p style={styles.subtitle}>{SUBTITLES[screen]}</p>
+      </div>
+      <div style={styles.headerActions}>
         {screen === 'discover' && (
-          <Pressable style={styles.menuButton} onPress={onToggleFilters} accessibilityLabel="Toggle filters">
-            <Text style={styles.menuButtonText}>⚲</Text>
-          </Pressable>
+          <button style={styles.menuButton} onClick={onToggleFilters} aria-label="Toggle filters">
+            <span style={styles.menuButtonText}>⚲</span>
+          </button>
         )}
-        <Pressable style={styles.menuButton} onPress={onOpenMenu} accessibilityLabel="Open menu">
-          <Text style={styles.menuButtonText}>☰</Text>
-        </Pressable>
-      </View>
-    </View>
+        <button style={styles.menuButton} onClick={onOpenMenu} aria-label="Open menu">
+          <span style={styles.menuButtonText}>☰</span>
+        </button>
+      </div>
+    </div>
   );
 }

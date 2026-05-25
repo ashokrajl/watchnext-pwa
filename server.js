@@ -3,14 +3,17 @@
 //   Add TMDB_BEARER to .env
 //   node server.js
 
-const http = require('http');
-const fs = require('fs');
-const path = require('path');
+import http from 'http';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 const ROOT = __dirname;
 
 loadEnvFile(path.join(ROOT, '.env'));
+loadEnvFile(path.join(ROOT, '.env.local'));
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',

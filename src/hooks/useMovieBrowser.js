@@ -162,7 +162,7 @@ export function useMovieBrowser({ screen, seen, rejected, toWatch, setError }) {
 
   useEffect(() => {
     if (!API_BASE) {
-      setError('Set EXPO_PUBLIC_API_BASE in .env for Expo Go, for example https://<your-app>.vercel.app/api/tmdb');
+      setError('Set VITE_API_BASE in .env to your deployed API URL, e.g. https://<your-app>.vercel.app/api/tmdb');
       return;
     }
 

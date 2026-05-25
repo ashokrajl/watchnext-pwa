@@ -1,108 +1,76 @@
-import { Animated, Pressable, ScrollView, Text, View } from 'react-native';
-import { Image } from 'expo-image';
-
 import { IMG_BASE } from '../constants';
 import { styles } from '../styles';
 import { toYearString } from '../utils/movie';
 
 export function MovieCard({
   movie,
-  flipValue,
   isFlipped,
   onToggleFlip,
   onMarkSeen,
   onMarkRejected,
   onAddToWatch,
 }) {
-  const frontOpacity = flipValue.interpolate({
-    inputRange: [0, 0.49, 0.5, 1],
-    outputRange: [1, 1, 0, 0],
-  });
-  const backOpacity = flipValue.interpolate({
-    inputRange: [0, 0.49, 0.5, 1],
-    outputRange: [0, 0, 1, 1],
-  });
+  // CSS 3D card flip — no Animated needed
+  const containerStyle = {
+    flex: 1,
+    position: 'relative',
+    transformStyle: 'preserve-3d',
+    transition: 'transform 0.45s ease',
+    transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
+  };
+
+  const faceBase = {
+    position: 'absolute',
+    top: 0, left: 0,
+    width: '100%', height: '100%',
+    backfaceVisibility: 'hidden',
+    WebkitBackfaceVisibility: 'hidden',
+  };
 
   return (
-    <View style={styles.card}>
-      <View style={styles.cardFlipContainer}>
-        <Animated.View
-          pointerEvents={isFlipped ? 'none' : 'auto'}
-          style={[
-            styles.cardFace,
-            styles.cardFrontFace,
-            {
-              opacity: frontOpacity,
-              transform: [
-                { perspective: 1000 },
-                {
-                  rotateY: flipValue.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: ['0deg', '180deg'],
-                  }),
-                },
-              ],
-            },
-          ]}
-        >
-          <Pressable onPress={() => onToggleFlip(movie)}>
-            <Image source={`${IMG_BASE}${movie.poster_path}`} style={styles.poster} contentFit="cover" />
+    <div style={styles.card}>
+      <div style={containerStyle}>
+        {/* Front */}
+        <div style={{ ...faceBase, ...styles.cardFrontFace }}>
+          <div style={{ cursor: 'pointer', flex: 1 }} onClick={() => onToggleFlip(movie)}>
+            <img src={`${IMG_BASE}${movie.poster_path}`} style={styles.poster} alt={movie.title} />
             <MovieSummary movie={movie} />
-          </Pressable>
-          <View style={styles.cardActions}>
-            <Pressable style={[styles.iconButton, styles.acceptButton]} onPress={() => onMarkSeen(movie.id)} accessibilityLabel="Mark as seen">
-              <Text style={styles.iconButtonText}>✓</Text>
-            </Pressable>
-            <Pressable style={[styles.iconButton, styles.rejectButton]} onPress={() => onMarkRejected(movie.id)} accessibilityLabel="Skip movie">
-              <Text style={styles.iconButtonText}>✕</Text>
-            </Pressable>
-            <Pressable style={[styles.iconButton, styles.toWatchIconButton]} onPress={() => onAddToWatch(movie)} accessibilityLabel="Add to To Watch">
-              <Text style={styles.iconButtonText}>＋</Text>
-            </Pressable>
-          </View>
-        </Animated.View>
+          </div>
+          <div style={styles.cardActions}>
+            <button style={{ ...styles.iconButton, ...styles.acceptButton }} onClick={() => onMarkSeen(movie.id)} aria-label="Mark as seen">
+              <span style={styles.iconButtonText}>✓</span>
+            </button>
+            <button style={{ ...styles.iconButton, ...styles.rejectButton }} onClick={() => onMarkRejected(movie.id)} aria-label="Skip movie">
+              <span style={styles.iconButtonText}>✕</span>
+            </button>
+            <button style={{ ...styles.iconButton, ...styles.toWatchIconButton }} onClick={() => onAddToWatch(movie)} aria-label="Add to To Watch">
+              <span style={styles.iconButtonText}>＋</span>
+            </button>
+          </div>
+        </div>
 
-        <Animated.View
-          pointerEvents={isFlipped ? 'auto' : 'none'}
-          style={[
-            styles.cardFace,
-            styles.cardBackFace,
-            {
-              opacity: backOpacity,
-              transform: [
-                { perspective: 1000 },
-                {
-                  rotateY: flipValue.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: ['180deg', '360deg'],
-                  }),
-                },
-              ],
-            },
-          ]}
-        >
-          <Pressable style={styles.cardBack} onPress={() => onToggleFlip(movie)}>
-            <ScrollView contentContainerStyle={styles.cardBackScrollContent} showsVerticalScrollIndicator={false}>
-              <MovieSummary movie={movie} />
-              <Text style={styles.detailLine}>Votes: {Number(movie.vote_count || 0).toLocaleString()}</Text>
-              <Text style={styles.detailLine}>Original language: {(movie.original_language || 'n/a').toUpperCase()}</Text>
-              <Text style={styles.overviewText}>{movie.overview || 'No description available.'}</Text>
-            </ScrollView>
-          </Pressable>
-        </Animated.View>
-      </View>
-    </View>
+        {/* Back */}
+        <div style={{ ...faceBase, ...styles.cardBackFace, transform: 'rotateY(180deg)' }}>
+          <div style={{ ...styles.cardBack, cursor: 'pointer', overflowY: 'auto' }} onClick={() => onToggleFlip(movie)}>
+            <MovieSummary movie={movie} />
+            <p style={styles.detailLine}>Votes: {Number(movie.vote_count || 0).toLocaleString()}</p>
+            <p style={styles.detailLine}>Original language: {(movie.original_language || 'n/a').toUpperCase()}</p>
+            <p style={styles.overviewText}>{movie.overview || 'No description available.'}</p>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
 function MovieSummary({ movie }) {
   return (
     <>
-      <Text style={styles.movieTitle} numberOfLines={2}>{movie.title || ''}</Text>
-      <View style={styles.metaRow}>
-        <Text style={styles.tag}>{toYearString(movie.release_date)}</Text>
-        <Text style={styles.ratingTag}>IMDb {Number(movie.vote_average || 0).toFixed(1)}</Text>
-      </View>
+      <p style={styles.movieTitle}>{movie.title || ''}</p>
+      <div style={styles.metaRow}>
+        <span style={styles.tag}>{toYearString(movie.release_date)}</span>
+        <span style={styles.ratingTag}>IMDb {Number(movie.vote_average || 0).toFixed(1)}</span>
+      </div>
     </>
   );
 }

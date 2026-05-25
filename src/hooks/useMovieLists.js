@@ -1,35 +1,109 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Alert } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { STORAGE_KEY } from '../constants';
+import { supabase } from '../lib/supabase';
+import { CLIENT_ID_KEY, STORAGE_KEY } from '../constants';
+
+function generateClientId() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
+  });
+}
+
+function getOrCreateClientId() {
+  let id = localStorage.getItem(CLIENT_ID_KEY);
+  if (!id) {
+    id = generateClientId();
+    localStorage.setItem(CLIENT_ID_KEY, id);
+  }
+  return id;
+}
+
+async function loadFromSupabase(clientId) {
+  const { data, error } = await supabase
+    .from('movie_lists')
+    .select('seen, rejected, to_watch')
+    .eq('client_id', clientId)
+    .maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
+async function saveToSupabase(clientId, seenSet, rejectedSet, toWatchMovies) {
+  const { error } = await supabase.from('movie_lists').upsert(
+    {
+      client_id: clientId,
+      seen: [...seenSet],
+      rejected: [...rejectedSet],
+      to_watch: toWatchMovies,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: 'client_id' }
+  );
+  if (error) throw error;
+}
 
 export function useMovieLists({ setError }) {
   const [seen, setSeen] = useState(new Set());
   const [rejected, setRejected] = useState(new Set());
   const [toWatch, setToWatch] = useState([]);
+  const [clientId] = useState(() => getOrCreateClientId());
 
-  const persistMovieLists = useCallback(async (seenSet, rejectedSet, toWatchMovies) => {
-    try {
-      await AsyncStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify({
-          seen: [...seenSet],
-          rejected: [...rejectedSet],
-          toWatch: toWatchMovies,
-        })
-      );
-    } catch (e) {
-      setError(`Failed to save movie lists: ${String(e?.message || e)}`);
-    }
-  }, [setError]);
+  const persistMovieLists = useCallback(
+    async (seenSet, rejectedSet, toWatchMovies) => {
+      // Write to localStorage immediately (works offline)
+      try {
+        localStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify({
+            seen: [...seenSet],
+            rejected: [...rejectedSet],
+            toWatch: toWatchMovies,
+          })
+        );
+      } catch (e) {
+        setError(`Failed to save movie lists: ${String(e?.message || e)}`);
+      }
+
+      // Sync to Supabase in the background; failures are non-fatal
+      if (supabase && clientId) {
+        saveToSupabase(clientId, seenSet, rejectedSet, toWatchMovies).catch((e) =>
+          console.warn('Supabase sync failed:', e?.message || e)
+        );
+      }
+    },
+    [setError, clientId]
+  );
 
   useEffect(() => {
     (async () => {
-      try {
-        const saved = await AsyncStorage.getItem(STORAGE_KEY);
-        if (!saved) return;
+      // Prefer Supabase; fall back to localStorage if unavailable or offline
+      if (supabase) {
+        try {
+          const remote = await loadFromSupabase(clientId);
+          if (remote) {
+            setSeen(new Set(remote.seen || []));
+            setRejected(new Set(remote.rejected || []));
+            setToWatch(Array.isArray(remote.to_watch) ? remote.to_watch : []);
+            localStorage.setItem(
+              STORAGE_KEY,
+              JSON.stringify({
+                seen: remote.seen || [],
+                rejected: remote.rejected || [],
+                toWatch: remote.to_watch || [],
+              })
+            );
+            return;
+          }
+        } catch (e) {
+          console.warn('Supabase load failed, using local cache:', e?.message || e);
+        }
+      }
 
+      // localStorage fallback
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (!saved) return;
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed)) {
           setSeen(new Set(parsed));
@@ -42,7 +116,7 @@ export function useMovieLists({ setError }) {
         setError(`Failed to load movie lists: ${String(e?.message || e)}`);
       }
     })();
-  }, [setError]);
+  }, [clientId, setError]);
 
   const markSeen = async (movieId) => {
     const nextSeen = new Set(seen);
@@ -82,20 +156,12 @@ export function useMovieLists({ setError }) {
   };
 
   const clearSeen = () => {
-    Alert.alert('Clear hidden movies?', 'This will make both seen and rejected movies visible again.', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Clear',
-        style: 'destructive',
-        onPress: async () => {
-          const nextSeen = new Set();
-          const nextRejected = new Set();
-          setSeen(nextSeen);
-          setRejected(nextRejected);
-          await persistMovieLists(nextSeen, nextRejected, toWatch);
-        },
-      },
-    ]);
+    if (!window.confirm('Clear hidden movies? This will make both seen and rejected movies visible again.')) return;
+    const nextSeen = new Set();
+    const nextRejected = new Set();
+    setSeen(nextSeen);
+    setRejected(nextRejected);
+    persistMovieLists(nextSeen, nextRejected, toWatch);
   };
 
   return {

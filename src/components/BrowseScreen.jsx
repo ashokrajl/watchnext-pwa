@@ -1,5 +1,3 @@
-import { ActivityIndicator, FlatList, Pressable, Text, View } from 'react-native';
-
 import { styles } from '../styles';
 import { FilterPanel } from './FilterPanel.jsx';
 import { MovieCard } from './MovieCard.jsx';
@@ -14,7 +12,6 @@ export function BrowseScreen({
   totalPages,
   filterState,
   flippedCards,
-  getFlipValue,
   onOpenGenres,
   onClearSeen,
   onLoadNextPage,
@@ -27,7 +24,7 @@ export function BrowseScreen({
   const emptyCopy = getEmptyCopy(screen, loading);
 
   return (
-    <>
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       {screen === 'discover' && filtersOpen && (
         <FilterPanel
           yearFrom={filterState.yearFrom}
@@ -45,80 +42,65 @@ export function BrowseScreen({
         />
       )}
 
-      {!!error && <Text style={styles.error}>{error}</Text>}
+      {!!error && <p style={styles.error}>{error}</p>}
 
-      <FlatList
-        data={movies}
-        keyExtractor={(item) => String(item.id)}
-        numColumns={2}
-        contentContainerStyle={styles.grid}
-        renderItem={({ item }) => (
-          <MovieCard
-            movie={item}
-            flipValue={getFlipValue(item.id)}
-            isFlipped={flippedCards.has(item.id)}
-            onToggleFlip={onToggleCardFlip}
-            onMarkSeen={onMarkSeen}
-            onMarkRejected={onMarkRejected}
-            onAddToWatch={onAddToWatch}
-          />
-        )}
-        ListEmptyComponent={(
-          <View style={styles.emptyState}>
+      <div style={{ flex: 1, overflowY: 'auto' }}>
+        {!hasMovies ? (
+          <div style={styles.emptyState}>
             {loading ? (
               <>
-                <ActivityIndicator color="#22d3ee" />
-                <Text style={styles.emptyStateTitle}>Loading movies...</Text>
+                <div className="spinner" />
+                <p style={styles.emptyStateTitle}>Loading movies...</p>
               </>
             ) : (
               <>
-                <Text style={styles.emptyStateTitle}>{emptyCopy.title}</Text>
-                <Text style={styles.emptyStateText}>{emptyCopy.body}</Text>
+                <p style={styles.emptyStateTitle}>{emptyCopy.title}</p>
+                <p style={styles.emptyStateText}>{emptyCopy.body}</p>
                 {page <= totalPages && (
-                  <Pressable style={[styles.button, styles.emptyStateButton]} onPress={onLoadNextPage}>
-                    <Text style={styles.buttonText}>Try next page</Text>
-                  </Pressable>
+                  <button style={{ ...styles.button, ...styles.emptyStateButton }} onClick={onLoadNextPage}>
+                    <span style={styles.buttonText}>Try next page</span>
+                  </button>
                 )}
               </>
             )}
-          </View>
+          </div>
+        ) : (
+          <>
+            <div style={styles.grid}>
+              {movies.map((item) => (
+                <MovieCard
+                  key={item.id}
+                  movie={item}
+                  isFlipped={flippedCards.has(item.id)}
+                  onToggleFlip={onToggleCardFlip}
+                  onMarkSeen={onMarkSeen}
+                  onMarkRejected={onMarkRejected}
+                  onAddToWatch={onAddToWatch}
+                />
+              ))}
+            </div>
+            <div style={styles.footer}>
+              <button
+                style={styles.button}
+                disabled={loading || page > totalPages}
+                onClick={onLoadNextPage}
+              >
+                <span style={styles.buttonText}>
+                  {page > totalPages ? 'No more results' : 'Load more'}
+                </span>
+              </button>
+              {loading && <div className="spinner" />}
+            </div>
+          </>
         )}
-        ListFooterComponent={(
-          <View style={styles.footer}>
-            {hasMovies && (
-              <Pressable style={styles.button} disabled={loading || page > totalPages} onPress={onLoadNextPage}>
-                <Text style={styles.buttonText}>{page > totalPages ? 'No more results' : 'Load more'}</Text>
-              </Pressable>
-            )}
-            {loading && <ActivityIndicator color="#22d3ee" style={styles.loader} />}
-          </View>
-        )}
-      />
-    </>
+      </div>
+    </div>
   );
 }
 
 function getEmptyCopy(screen, loading) {
-  if (loading) {
-    return { title: 'Loading movies...', body: '' };
-  }
-
-  if (screen === 'tamil') {
-    return {
-      title: 'No Tamil movies loaded yet',
-      body: 'If this keeps happening, restart the local dev server so it picks up the Tamil API filter.',
-    };
-  }
-
-  if (screen === 'kids') {
-    return {
-      title: 'No kids movies found',
-      body: 'Try widening the year range or loading another page.',
-    };
-  }
-
-  return {
-    title: 'No movies found',
-    body: 'Try widening your filters or loading another page.',
-  };
+  if (loading) return { title: 'Loading movies...', body: '' };
+  if (screen === 'tamil') return { title: 'No Tamil movies loaded yet', body: 'Try widening the year range or loading another page.' };
+  if (screen === 'kids') return { title: 'No kids movies found', body: 'Try widening the year range or loading another page.' };
+  return { title: 'No movies found', body: 'Try widening your filters or loading another page.' };
 }

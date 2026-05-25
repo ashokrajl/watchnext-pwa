@@ -11,6 +11,7 @@ const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 const ROOT = __dirname;
 
 loadEnvFile(path.join(ROOT, '.env'));
+loadEnvFile(path.join(ROOT, '.env.local'));
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',

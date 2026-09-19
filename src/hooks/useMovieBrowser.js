@@ -33,6 +33,7 @@ export function useMovieBrowser({ screen, seen, rejected, toWatch, setError }) {
   const [loading, setLoading] = useState(false);
   const [browseVersion, setBrowseVersion] = useState(0);
   const requestVersionRef = useRef(0);
+  const fetchInFlightRef = useRef(false);
 
   const isBrowseScreen = screen === 'discover' || screen === 'kids' || screen === 'tamil';
 
@@ -56,8 +57,8 @@ export function useMovieBrowser({ screen, seen, rejected, toWatch, setError }) {
 
   const fetchGenres = useCallback(async () => {
     const res = await fetchWithTimeout(`${API_BASE}?mode=genres`);
-    if (!res.ok) throw new Error('Genres fetch failed');
-    const data = await res.json();
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data?.error || 'Genres fetch failed');
     setGenres(data.genres || []);
   }, []);
 
@@ -84,15 +85,17 @@ export function useMovieBrowser({ screen, seen, rejected, toWatch, setError }) {
 
     params.set('mode', 'discover');
     const res = await fetchWithTimeout(`${API_BASE}?${params.toString()}`);
-    if (!res.ok) throw new Error('Movie fetch failed');
-    return res.json();
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data?.error || 'Movie fetch failed');
+    return data;
   }, [ratingMax, ratingMin, screen, selectedGenres, yearFrom, yearTo]);
   const fetchMoviesRef = useRef(fetchMovies);
   fetchMoviesRef.current = fetchMovies;
 
   const loadNextPage = useCallback(async () => {
-    if (!isBrowseScreen || loading || page > totalPages) return;
+    if (!isBrowseScreen || fetchInFlightRef.current || page > totalPages) return;
     const requestVersion = requestVersionRef.current;
+    fetchInFlightRef.current = true;
     setLoading(true);
     setError('');
     try {
@@ -104,9 +107,10 @@ export function useMovieBrowser({ screen, seen, rejected, toWatch, setError }) {
     } catch (e) {
       setError(String(e?.message || e));
     } finally {
+      fetchInFlightRef.current = false;
       setLoading(false);
     }
-  }, [fetchMovies, isBrowseScreen, loading, page, setError, totalPages]);
+  }, [fetchMovies, isBrowseScreen, page, setError, totalPages]);
 
   const loadFirstPage = useCallback(async () => {
     if (!isBrowseScreen) return;

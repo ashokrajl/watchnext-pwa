@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import { AppHeader } from './src/components/AppHeader.jsx';
 import { AppMenu } from './src/components/AppMenu.jsx';
+import { AiPicksScreen } from './src/components/AiPicksScreen.jsx';
 import { BrowseScreen } from './src/components/BrowseScreen.jsx';
 import { GenrePicker } from './src/components/GenrePicker.jsx';
 import { MovieDetailModal } from './src/components/MovieDetailModal.jsx';
@@ -9,6 +10,7 @@ import { ToWatchScreen } from './src/components/ToWatchScreen.jsx';
 import { useCardFlips } from './src/hooks/useCardFlips';
 import { useMovieBrowser } from './src/hooks/useMovieBrowser';
 import { useMovieLists } from './src/hooks/useMovieLists';
+import { recordTaste } from './src/lib/tasteProfile';
 import { styles } from './src/styles';
 
 export default function App() {
@@ -35,6 +37,25 @@ export default function App() {
     }
     setScreen(nextScreen);
     setMenuOpen(false);
+  };
+
+  // Record titles for the AI taste profile whenever the user judges a movie.
+  // movieHint covers movies outside the current browse list (AI picks, To Watch).
+  const findMovie = (id) =>
+    browser.visibleMovies.find((m) => m.id === id) ||
+    movieLists.toWatch.find((m) => m.id === id) ||
+    null;
+
+  const handleMarkSeen = (id, movieHint) => {
+    const movie = movieHint || findMovie(id);
+    if (movie) recordTaste(movie, 'liked');
+    movieLists.markSeen(id);
+  };
+
+  const handleMarkRejected = (id, movieHint) => {
+    const movie = movieHint || findMovie(id);
+    if (movie) recordTaste(movie, 'disliked');
+    movieLists.markRejected(id);
   };
 
   return (
@@ -72,16 +93,25 @@ export default function App() {
           onClearSeen={movieLists.clearSeen}
           onLoadNextPage={browser.loadNextPage}
           onToggleCardFlip={cardFlips.toggleCardFlip}
-          onMarkSeen={movieLists.markSeen}
-          onMarkRejected={movieLists.markRejected}
+          onMarkSeen={handleMarkSeen}
+          onMarkRejected={handleMarkRejected}
           onAddToWatch={movieLists.addToWatch}
           onOpenDetails={setDetailMovie}
         />
-      ) : (
+      ) : screen === 'toWatch' ? (
         <ToWatchScreen
           movies={movieLists.toWatch}
-          onMarkSeen={movieLists.markSeen}
+          onMarkSeen={handleMarkSeen}
           onRemoveFromToWatch={movieLists.removeFromToWatch}
+          onOpenDetails={setDetailMovie}
+        />
+      ) : (
+        <AiPicksScreen
+          watchlist={movieLists.toWatch}
+          seenIds={movieLists.seen}
+          rejectedIds={movieLists.rejected}
+          onMarkSeen={handleMarkSeen}
+          onAddToWatch={movieLists.addToWatch}
           onOpenDetails={setDetailMovie}
         />
       )}
@@ -104,7 +134,7 @@ export default function App() {
         <MovieDetailModal
           movie={detailMovie}
           onClose={() => setDetailMovie(null)}
-          onMarkSeen={movieLists.markSeen}
+          onMarkSeen={handleMarkSeen}
           onAddToWatch={movieLists.addToWatch}
         />
       )}

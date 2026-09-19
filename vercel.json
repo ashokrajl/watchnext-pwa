@@ -23,6 +23,10 @@
       "dest": "/api/tmdb.js"
     },
     {
+      "src": "/api/recommend",
+      "dest": "/api/recommend.js"
+    },
+    {
       "src": "/offline.html",
       "dest": "/offline.html"
     },

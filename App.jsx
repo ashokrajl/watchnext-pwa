@@ -39,6 +39,7 @@ export default function App() {
     <div style={styles.container}>
       <AppHeader
         screen={screen}
+        syncState={movieLists.syncState}
         onToggleFilters={() => setFiltersOpen((prev) => !prev)}
         onOpenMenu={() => setMenuOpen(true)}
       />

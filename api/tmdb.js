@@ -106,6 +106,14 @@ export default async function handler(req, res) {
     endpoint = '/search/movie';
     extra.set('query', query);
     extra.set('include_adult', 'false');
+  } else if (mode === 'detail') {
+    const id = searchParams.get('id');
+    if (typeof id !== 'string' || !/^\d{1,10}$/.test(id)) {
+      return res.status(400).json({ error: 'Missing or invalid "id" parameter.' });
+    }
+    endpoint = `/movie/${id}`;
+    // One round trip: details + trailers + cast + watch providers.
+    extra.set('append_to_response', 'videos,credits,watch/providers');
   } else if (mode === 'discover') {
     endpoint = '/discover/movie';
     const genres = parseCsvIds(searchParams.get('genres'));

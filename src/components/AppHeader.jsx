@@ -2,6 +2,7 @@ import { styles } from '../styles';
 
 const TITLES = {
   discover: 'WatchNext',
+  aiPicks: '✨ AI Picks',
   kids: 'Kids',
   tamil: 'Tamil',
   toWatch: 'To Watch',
@@ -9,6 +10,7 @@ const TITLES = {
 
 const SUBTITLES = {
   discover: 'Discover popular movies and hide what you have seen.',
+  aiPicks: 'Personal picks from an AI that knows your taste.',
   kids: 'Family and PG-safe movie picks for kids.',
   tamil: 'Tamil language movies only.',
   toWatch: 'Movies you saved for later.',

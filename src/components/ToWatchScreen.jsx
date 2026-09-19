@@ -2,7 +2,7 @@ import { IMG_BASE } from '../constants';
 import { styles } from '../styles';
 import { toYearString } from '../utils/movie';
 
-export function ToWatchScreen({ movies, onMarkSeen, onRemoveFromToWatch }) {
+export function ToWatchScreen({ movies, onMarkSeen, onRemoveFromToWatch, onOpenDetails }) {
   return (
     <div style={{ flex: 1, overflowY: 'auto' }}>
       {movies.length === 0 ? (
@@ -24,6 +24,9 @@ export function ToWatchScreen({ movies, onMarkSeen, onRemoveFromToWatch }) {
                   </button>
                   <button style={{ ...styles.iconButton, ...styles.removeButton }} onClick={() => onRemoveFromToWatch(item.id)} aria-label="Remove from To Watch">
                     <span style={styles.iconButtonText}>🗑</span>
+                  </button>
+                  <button style={{ ...styles.iconButton, ...styles.toWatchIconButton }} onClick={() => onOpenDetails(item)} aria-label="View details">
+                    <span style={styles.iconButtonText}>ⓘ</span>
                   </button>
                 </div>
               </div>

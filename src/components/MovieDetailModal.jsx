@@ -172,7 +172,7 @@ export function MovieDetailModal({ movie, onClose, onMarkSeen, onAddToWatch }) {
             <button
               style={s.actionBtn}
               onClick={() => {
-                onMarkSeen(movie.id);
+                onMarkSeen(movie.id, movie);
                 onClose();
               }}
             >

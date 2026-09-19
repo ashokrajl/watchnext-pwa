@@ -19,8 +19,10 @@ This is the easiest way to make the app available when your laptop is off.
 
 1. Push this repo to GitHub.
 2. In Vercel, create a new project from the repo.
-3. Add an environment variable:
+3. Add environment variables:
    - `TMDB_BEARER=your_tmdb_bearer_token`
+   - `OPENROUTER_API_KEY=your_openrouter_key` (only needed for the ✨ AI Picks screen)
+   - `OPENROUTER_MODEL=openai/gpt-oss-20b:free` (optional — overrides the default free model; free models rotate on OpenRouter)
 4. Use the included Vercel settings:
    - Build command: `npm run build`
    - Output directory: `dist`
@@ -41,6 +43,10 @@ The hosted web app uses `/api/tmdb` automatically, so you do not need to set `EX
 ## TMDB proxy
 
 - `api/tmdb.js` is still used for Vercel deployments.
+- `api/recommend.js` powers the ✨ AI Picks screen: it sends your taste profile
+  (seen / skipped / to-watch titles plus an optional mood) to OpenRouter and
+  resolves the AI's suggestions to real TMDB movies. Requires
+  `OPENROUTER_API_KEY` server-side; the key never reaches the browser.
 - `server.js` is still available for local proxy development.
 - Keep `TMDB_BEARER` server-side only (never in Expo public env vars).
 

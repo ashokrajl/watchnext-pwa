@@ -9,3 +9,10 @@ createRoot(document.getElementById('root')).render(
     <App />
   </StrictMode>
 );
+
+// Offline fallback page (no precaching of app code, so updates are never stale).
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
+}

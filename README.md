@@ -33,6 +33,7 @@ The hosted web app uses `/api/tmdb` automatically, so you do not need to set `EX
 - The app expects:
   - `GET {EXPO_PUBLIC_API_BASE}/genres`
   - `GET {EXPO_PUBLIC_API_BASE}/discover?...`
+  - `GET {EXPO_PUBLIC_API_BASE}?mode=detail&id={tmdbId}` — full details with trailers, cast, and watch providers in one call
 - If you use local `server.js` and test on a physical phone, do not use `localhost`.
   Use your machine LAN IP, for example:
   - `EXPO_PUBLIC_API_BASE=http://192.168.1.45:3000/api/tmdb`

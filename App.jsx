@@ -4,6 +4,7 @@ import { AppHeader } from './src/components/AppHeader.jsx';
 import { AppMenu } from './src/components/AppMenu.jsx';
 import { BrowseScreen } from './src/components/BrowseScreen.jsx';
 import { GenrePicker } from './src/components/GenrePicker.jsx';
+import { MovieDetailModal } from './src/components/MovieDetailModal.jsx';
 import { ToWatchScreen } from './src/components/ToWatchScreen.jsx';
 import { useCardFlips } from './src/hooks/useCardFlips';
 import { useMovieBrowser } from './src/hooks/useMovieBrowser';
@@ -16,6 +17,7 @@ export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [screen, setScreen] = useState('discover');
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [detailMovie, setDetailMovie] = useState(null);
 
   const movieLists = useMovieLists({ setError });
   const browser = useMovieBrowser({
@@ -73,12 +75,14 @@ export default function App() {
           onMarkSeen={movieLists.markSeen}
           onMarkRejected={movieLists.markRejected}
           onAddToWatch={movieLists.addToWatch}
+          onOpenDetails={setDetailMovie}
         />
       ) : (
         <ToWatchScreen
           movies={movieLists.toWatch}
           onMarkSeen={movieLists.markSeen}
           onRemoveFromToWatch={movieLists.removeFromToWatch}
+          onOpenDetails={setDetailMovie}
         />
       )}
 
@@ -95,6 +99,15 @@ export default function App() {
         onToggleGenre={browser.toggleGenre}
         onClose={() => setGenrePickerOpen(false)}
       />
+
+      {detailMovie && (
+        <MovieDetailModal
+          movie={detailMovie}
+          onClose={() => setDetailMovie(null)}
+          onMarkSeen={movieLists.markSeen}
+          onAddToWatch={movieLists.addToWatch}
+        />
+      )}
     </div>
   );
 }

@@ -19,6 +19,7 @@ export function BrowseScreen({
   onMarkSeen,
   onMarkRejected,
   onAddToWatch,
+  onOpenDetails,
 }) {
   const hasMovies = movies.length > 0;
   const emptyCopy = getEmptyCopy(screen, loading);
@@ -76,6 +77,7 @@ export function BrowseScreen({
                   onMarkSeen={onMarkSeen}
                   onMarkRejected={onMarkRejected}
                   onAddToWatch={onAddToWatch}
+                  onOpenDetails={onOpenDetails}
                 />
               ))}
             </div>

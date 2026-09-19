@@ -9,6 +9,7 @@ export function MovieCard({
   onMarkSeen,
   onMarkRejected,
   onAddToWatch,
+  onOpenDetails,
 }) {
   // CSS 3D card flip — no Animated needed
   const containerStyle = {
@@ -56,6 +57,16 @@ export function MovieCard({
             <p style={styles.detailLine}>Votes: {Number(movie.vote_count || 0).toLocaleString()}</p>
             <p style={styles.detailLine}>Original language: {(movie.original_language || 'n/a').toUpperCase()}</p>
             <p style={styles.overviewText}>{movie.overview || 'No description available.'}</p>
+            <button
+              style={detailsButtonStyle}
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpenDetails(movie);
+              }}
+              aria-label="View full details"
+            >
+              <span style={styles.iconButtonText}>ⓘ Details</span>
+            </button>
           </div>
         </div>
       </div>
@@ -74,3 +85,15 @@ function MovieSummary({ movie }) {
     </>
   );
 }
+
+const detailsButtonStyle = {
+  marginTop: 10,
+  alignSelf: 'stretch',
+  padding: '8px 0',
+  borderRadius: 10,
+  border: '1px solid #f5b942',
+  background: 'transparent',
+  color: '#f5b942',
+  fontSize: 14,
+  cursor: 'pointer',
+};

@@ -33,7 +33,7 @@ export function MovieCard({
         {/* Front */}
         <div style={{ ...faceBase, ...styles.cardFrontFace }}>
           <div style={{ cursor: 'pointer', flex: 1 }} onClick={() => onToggleFlip(movie)}>
-            <img src={`${IMG_BASE}${movie.poster_path}`} style={styles.poster} alt={movie.title} />
+            <img src={`${IMG_BASE}${movie.poster_path}`} style={styles.poster} alt={movie.title} loading="lazy" />
             <MovieSummary movie={movie} />
           </div>
           <div style={styles.cardActions}>

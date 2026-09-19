@@ -11,7 +11,7 @@ export function ToWatchScreen({ movies, onMarkSeen, onRemoveFromToWatch }) {
         <div style={styles.toWatchList}>
           {movies.map((item) => (
             <div key={item.id} style={styles.toWatchCard}>
-              <img src={`${IMG_BASE}${item.poster_path}`} style={styles.toWatchPoster} alt={item.title} />
+              <img src={`${IMG_BASE}${item.poster_path}`} style={styles.toWatchPoster} alt={item.title} loading="lazy" />
               <div style={styles.toWatchMeta}>
                 <p style={styles.movieTitle}>{item.title || ''}</p>
                 <div style={styles.metaRow}>

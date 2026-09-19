@@ -43,6 +43,34 @@ The hosted web app uses `/api/tmdb` automatically, so you do not need to set `EX
 - `server.js` is still available for local proxy development.
 - Keep `TMDB_BEARER` server-side only (never in Expo public env vars).
 
+## Cloud sync (Supabase)
+
+Your seen / rejected / to-watch lists are stored on-device first and synced to
+Supabase in the background, so they follow you across devices. The header shows
+the sync status (Syncing… / Synced / Offline / Sync failed).
+
+Setup (one time):
+
+1. Create a Supabase project.
+2. In the Supabase dashboard, open the SQL editor and run, in order:
+   - `supabase/migrations/20260512_create_movie_lists.sql` (initial schema)
+   - `supabase/migrations/20260919_secure_movie_lists.sql` (locks the table down:
+     each row gets an unguessable secret and all access goes through secure
+     database functions — until you run it, the app falls back to the legacy
+     permissive setup)
+3. Add to your Vercel project's environment variables:
+   - `VITE_SUPABASE_URL=https://your-project.supabase.co`
+   - `VITE_SUPABASE_ANON_KEY=sb_publishable_...` (from Settings > API Keys)
+
+How it behaves:
+
+- Offline changes are never lost: on load, the local and cloud copies are
+  merged (union of ids; "seen" wins a seen-vs-rejected conflict).
+- Cloud writes are serialized, so rapid taps can't reorder them.
+- Rows created before the secure migration get new random secrets and are
+  re-created from each device's local copy on the next save — no on-device
+  data is lost.
+
 ## Legacy web app
 
 The previous static PWA files were archived under `_archive/pwa/`.

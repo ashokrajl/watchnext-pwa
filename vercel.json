@@ -23,6 +23,22 @@
       "dest": "/api/tmdb.js"
     },
     {
+      "src": "/offline.html",
+      "dest": "/offline.html"
+    },
+    {
+      "src": "/sw.js",
+      "dest": "/sw.js"
+    },
+    {
+      "src": "/manifest.webmanifest",
+      "dest": "/manifest.webmanifest"
+    },
+    {
+      "src": "/icons/(.*)",
+      "dest": "/icons/$1"
+    },
+    {
       "src": "/(.*\\.(?:js|css|ico|png|jpg|jpeg|svg|json|webmanifest))",
       "dest": "/$1"
     },

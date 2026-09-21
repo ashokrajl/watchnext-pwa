@@ -6,10 +6,10 @@ export function AppMenu({ visible, onClose, onSelectScreen }) {
   return (
     <div style={styles.menuBackdrop} onClick={onClose}>
       <div style={styles.menuPanel} onClick={(e) => e.stopPropagation()}>
-        {['discover', 'aiPicks', 'toWatch', 'hidden', 'kids', 'tamil'].map((s) => (
+        {['discover', 'aiPicks', 'toWatch', 'history', 'kids', 'tamil'].map((s) => (
           <button key={s} style={styles.menuItem} onClick={() => onSelectScreen(s)}>
             <span style={styles.menuItemText}>
-              {{ discover: 'Discover', aiPicks: '✨ AI Picks', toWatch: 'To Watch', hidden: 'Hidden', kids: 'Kids', tamil: 'Tamil' }[s]}
+              {{ discover: 'Discover', aiPicks: '✨ AI Picks', toWatch: 'To Watch', history: 'History', kids: 'Kids', tamil: 'Tamil' }[s]}
             </span>
           </button>
         ))}

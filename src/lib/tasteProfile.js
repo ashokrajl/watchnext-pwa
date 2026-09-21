@@ -41,7 +41,7 @@ export function recordTaste(movie, kind) {
   if (kind !== 'liked' && kind !== 'disliked') return;
   const profile = read();
   const bucket = profile[kind];
-  bucket[String(movie.id)] = { t: movie.title, y: yearOf(movie) };
+  bucket[String(movie.id)] = { t: movie.title, y: yearOf(movie), p: movie.poster_path || null };
   // A movie can't be both liked and disliked — latest action wins.
   const other = kind === 'liked' ? profile.disliked : profile.liked;
   delete other[String(movie.id)];
@@ -66,8 +66,8 @@ export function getTasteProfile() {
   return { liked: toList(profile.liked), disliked: toList(profile.disliked) };
 }
 
-// Look up one cached title/year by TMDB id (used by the hidden-items screen).
-// Returns { title, year, kind } where kind is 'liked' | 'disliked', or null.
+// Look up one cached title/year/poster by TMDB id (used by the history screen).
+// Returns { title, year, poster, kind } where kind is 'liked' | 'disliked', or null.
 export function getTasteEntry(movieId) {
   if (movieId == null) return null;
   const profile = read();
@@ -75,7 +75,7 @@ export function getTasteEntry(movieId) {
   const liked = profile.liked[key];
   const entry = liked || profile.disliked[key] || null;
   if (!entry || !entry.t) return null;
-  return { title: entry.t, year: entry.y || null, kind: liked ? 'liked' : 'disliked' };
+  return { title: entry.t, year: entry.y || null, poster: entry.p || null, kind: liked ? 'liked' : 'disliked' };
 }
 
 // Drop a movie from the taste cache — used when restoring an accidental hide

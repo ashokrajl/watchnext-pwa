@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 
-import { API_BASE } from '../constants';
+import { API_BASE, IMG_BASE } from '../constants';
 import { getTasteEntry, recordTaste } from '../lib/tasteProfile';
 import { styles } from '../styles';
 
-// Cap for lazy title lookups so a huge hidden list doesn't hammer the proxy.
+// Cap for lazy title lookups so a huge history list doesn't hammer the proxy.
 const MAX_LAZY_RESOLVE = 25;
 
 function yearOf(releaseDate) {
@@ -20,6 +20,7 @@ function buildEntries(ids, kind) {
       kind, // 'rejected' (skipped) | 'seen'
       title: cached?.title || null,
       year: cached?.year ?? null,
+      poster: cached?.poster || null,
       resolved: !!cached,
     };
   });
@@ -46,39 +47,40 @@ function Section({ title, entries, onRestoreAll, onRestore, onOpenDetails }) {
       </div>
       <div style={styles.toWatchList}>
         {entries.length === 0 ? (
-          <p style={{ ...styles.emptyText, marginTop: 8 }}>None.</p>
+          <p style={{ ...styles.emptyText, marginTop: 8 }}>None yet.</p>
         ) : (
           entries.map((entry) => (
-            <div key={entry.id} style={styles.toWatchCard}>
-              <div style={styles.toWatchMeta}>
-                <p style={styles.movieTitle}>
+            <div
+              key={entry.id}
+              style={styles.historyRow}
+              onClick={() => onOpenDetails({ id: entry.id, title: entry.title || 'Movie' })}
+            >
+              {entry.poster ? (
+                <img
+                  src={`${IMG_BASE}${entry.poster}`}
+                  alt=""
+                  loading="lazy"
+                  style={styles.historyPoster}
+                />
+              ) : (
+                <div style={styles.historyPoster} />
+              )}
+              <div style={styles.historyMeta}>
+                <p style={styles.historyTitle}>
                   {entry.resolved ? entry.title : 'Loading…'}
                 </p>
-                <div style={styles.metaRow}>
-                  <span style={styles.tag}>{entry.year || '—'}</span>
-                  <span style={styles.hiddenBadge}>
-                    {entry.kind === 'rejected' ? 'SKIPPED' : 'SEEN'}
-                  </span>
-                </div>
-                <div style={styles.toWatchActions}>
-                  <button
-                    style={styles.restoreButton}
-                    onClick={() => onRestore(entry.id)}
-                    aria-label={`Restore ${entry.title || 'movie'}`}
-                  >
-                    <span style={styles.iconButtonText}>↩ Restore</span>
-                  </button>
-                  <button
-                    style={{ ...styles.iconButton, ...styles.toWatchIconButton, width: '31%' }}
-                    onClick={() =>
-                      onOpenDetails({ id: entry.id, title: entry.title || 'Movie' })
-                    }
-                    aria-label="View details"
-                  >
-                    <span style={styles.iconButtonText}>ⓘ</span>
-                  </button>
-                </div>
+                <p style={styles.historyYear}>{entry.year || '—'}</p>
               </div>
+              <button
+                style={styles.historyRestore}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onRestore(entry.id);
+                }}
+                aria-label={`Restore ${entry.title || 'movie'}`}
+              >
+                <span style={styles.historyRestoreText}>↩</span>
+              </button>
             </div>
           ))
         )}
@@ -93,12 +95,12 @@ export function HiddenScreen({ seenIds, rejectedIds, onUnhide, onUnhideMany, onO
     ...buildEntries(seenIds, 'seen'),
   ]);
 
-  // Rebuild when the hidden sets change (e.g. after a restore).
+  // Rebuild when the history sets change (e.g. after a restore).
   useEffect(() => {
     setEntries([...buildEntries(rejectedIds, 'rejected'), ...buildEntries(seenIds, 'seen')]);
   }, [seenIds, rejectedIds]);
 
-  // Titles for older hidden movies may predate the taste-profile cache —
+  // Titles for older history movies may predate the taste-profile cache —
   // resolve them lazily through the detail endpoint and cache the result.
   useEffect(() => {
     const unresolved = entries.filter((e) => !e.resolved).slice(0, MAX_LAZY_RESOLVE);
@@ -114,14 +116,25 @@ export function HiddenScreen({ seenIds, rejectedIds, onUnhide, onUnhideMany, onO
           const detail = await res.json().catch(() => null);
           if (cancelled || !detail?.title) continue;
           recordTaste(
-            { id: entry.id, title: detail.title, release_date: detail.release_date },
+            {
+              id: entry.id,
+              title: detail.title,
+              release_date: detail.release_date,
+              poster_path: detail.poster_path || null,
+            },
             entry.kind === 'seen' ? 'liked' : 'disliked'
           );
           if (!cancelled) {
             setEntries((prev) =>
               prev.map((e) =>
                 e.id === entry.id
-                  ? { ...e, title: detail.title, year: yearOf(detail.release_date), resolved: true }
+                  ? {
+                      ...e,
+                      title: detail.title,
+                      year: yearOf(detail.release_date),
+                      poster: detail.poster_path || null,
+                      resolved: true,
+                    }
                   : e
               )
             );
@@ -143,7 +156,7 @@ export function HiddenScreen({ seenIds, rejectedIds, onUnhide, onUnhideMany, onO
     <div style={{ flex: 1, overflowY: 'auto' }}>
       {entries.length === 0 ? (
         <p style={styles.emptyText}>
-          Nothing hidden. Movies you mark as seen or skip will show up here.
+          Nothing here yet. Movies you mark as seen or skip will show up here.
         </p>
       ) : (
         <>
@@ -151,7 +164,7 @@ export function HiddenScreen({ seenIds, rejectedIds, onUnhide, onUnhideMany, onO
             title="Skipped"
             entries={skipped}
             onRestoreAll={onUnhideMany}
-            onRestore={onUnhide}
+            onRestore={onRestore}
             onOpenDetails={onOpenDetails}
           />
           <Section

@@ -64,6 +64,14 @@ export const styles = {
   removeButton: { border: '1px solid #334155', backgroundColor: '#0f172a' },
   emptyText: { color: '#94a3b8', textAlign: 'center', marginTop: 30 },
 
+  sectionHeader: { display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: '14px 12px 2px' },
+  sectionTitle: { color: '#e5e7eb', fontWeight: 700, fontSize: 15, margin: 0 },
+  sectionCount: { color: '#64748b', fontSize: 12, margin: 0 },
+  restoreAllButton: { border: '1px solid #166534', backgroundColor: 'transparent', borderRadius: 8, padding: '6px 10px', cursor: 'pointer' },
+  restoreAllButtonText: { color: '#4ade80', fontWeight: 700, fontSize: 12, margin: 0 },
+  hiddenBadge: { color: '#fbbf24', fontSize: 11, fontWeight: 700, margin: 0 },
+  restoreButton: { flex: 1, border: '1px solid #166534', backgroundColor: '#15803d', borderRadius: 8, padding: '8px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', marginRight: 6 },
+
   modalBackdrop: { position: 'fixed', inset: 0, backgroundColor: 'rgba(2,6,23,0.8)', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', zIndex: 1000 },
   modalPanel: { backgroundColor: '#111827', borderTopLeftRadius: 16, borderTopRightRadius: 16, padding: 14, maxHeight: '72%', display: 'flex', flexDirection: 'column' },
   modalTitle: { color: '#e5e7eb', fontWeight: 700, fontSize: 18, margin: '0 0 8px' },

@@ -66,6 +66,29 @@ export function getTasteProfile() {
   return { liked: toList(profile.liked), disliked: toList(profile.disliked) };
 }
 
+// Look up one cached title/year by TMDB id (used by the hidden-items screen).
+// Returns { title, year, kind } where kind is 'liked' | 'disliked', or null.
+export function getTasteEntry(movieId) {
+  if (movieId == null) return null;
+  const profile = read();
+  const key = String(movieId);
+  const liked = profile.liked[key];
+  const entry = liked || profile.disliked[key] || null;
+  if (!entry || !entry.t) return null;
+  return { title: entry.t, year: entry.y || null, kind: liked ? 'liked' : 'disliked' };
+}
+
+// Drop a movie from the taste cache — used when restoring an accidental hide
+// so the AI doesn't keep treating it as a like/dislike.
+export function forgetTaste(movieId) {
+  if (movieId == null) return;
+  const profile = read();
+  const key = String(movieId);
+  delete profile.liked[key];
+  delete profile.disliked[key];
+  write(profile);
+}
+
 export function clearTasteProfile() {
   try {
     localStorage.removeItem(KEY);

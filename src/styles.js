@@ -72,6 +72,14 @@ export const styles = {
   hiddenBadge: { color: '#fbbf24', fontSize: 11, fontWeight: 700, margin: 0 },
   restoreButton: { flex: 1, border: '1px solid #166534', backgroundColor: '#15803d', borderRadius: 8, padding: '8px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', marginRight: 6 },
 
+  historyRow: { display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 10, padding: 8, border: '1px solid #1f2937', borderRadius: 12, backgroundColor: '#111827', cursor: 'pointer' },
+  historyPoster: { width: 48, height: 72, borderRadius: 8, backgroundColor: '#0f172a', objectFit: 'cover', flexShrink: 0, display: 'block' },
+  historyMeta: { flex: 1, display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 },
+  historyTitle: { color: '#e5e7eb', fontSize: 14, fontWeight: 600, margin: 0, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' },
+  historyYear: { color: '#94a3b8', fontSize: 12, margin: 0 },
+  historyRestore: { border: '1px solid #166534', backgroundColor: 'transparent', borderRadius: 8, padding: '7px 11px', cursor: 'pointer', flexShrink: 0 },
+  historyRestoreText: { color: '#4ade80', fontWeight: 700, fontSize: 16, margin: 0 },
+
   modalBackdrop: { position: 'fixed', inset: 0, backgroundColor: 'rgba(2,6,23,0.8)', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', zIndex: 1000 },
   modalPanel: { backgroundColor: '#111827', borderTopLeftRadius: 16, borderTopRightRadius: 16, padding: 14, maxHeight: '72%', display: 'flex', flexDirection: 'column' },
   modalTitle: { color: '#e5e7eb', fontWeight: 700, fontSize: 18, margin: '0 0 8px' },

@@ -6,6 +6,7 @@ const TITLES = {
   kids: 'Kids',
   tamil: 'Tamil',
   toWatch: 'To Watch',
+  hidden: 'Hidden',
 };
 
 const SUBTITLES = {
@@ -14,6 +15,7 @@ const SUBTITLES = {
   kids: 'Family and PG-safe movie picks for kids.',
   tamil: 'Tamil language movies only.',
   toWatch: 'Movies you saved for later.',
+  hidden: 'Movies you hid — restore the accidental taps.',
 };
 
 const SYNC_STYLES = {

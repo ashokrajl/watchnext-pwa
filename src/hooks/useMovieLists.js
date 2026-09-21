@@ -348,6 +348,27 @@ export function useMovieLists({ setError }) {
     persistMovieLists(nextSeen, nextRejected, toWatch);
   };
 
+  // Restore one hidden movie (removes it from both seen and rejected).
+  const unhideMovie = (movieId) => {
+    const nextSeen = new Set(seen);
+    const nextRejected = new Set(rejected);
+    nextSeen.delete(movieId);
+    nextRejected.delete(movieId);
+    setSeen(nextSeen);
+    setRejected(nextRejected);
+    persistMovieLists(nextSeen, nextRejected, toWatch);
+  };
+
+  // Restore several hidden movies in one write.
+  const unhideMovies = (movieIds) => {
+    const ids = new Set(movieIds);
+    const nextSeen = new Set([...seen].filter((id) => !ids.has(id)));
+    const nextRejected = new Set([...rejected].filter((id) => !ids.has(id)));
+    setSeen(nextSeen);
+    setRejected(nextRejected);
+    persistMovieLists(nextSeen, nextRejected, toWatch);
+  };
+
   return {
     seen,
     rejected,
@@ -358,5 +379,7 @@ export function useMovieLists({ setError }) {
     addToWatch,
     removeFromToWatch,
     clearSeen,
+    unhideMovie,
+    unhideMovies,
   };
 }

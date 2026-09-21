@@ -127,7 +127,7 @@ export default function App() {
           onAddToWatch={movieLists.addToWatch}
           onOpenDetails={setDetailMovie}
         />
-      ) : screen === 'hidden' ? (
+      ) : screen === 'history' ? (
         <HiddenScreen
           seenIds={movieLists.seen}
           rejectedIds={movieLists.rejected}

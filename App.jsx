@@ -5,12 +5,13 @@ import { AppMenu } from './src/components/AppMenu.jsx';
 import { AiPicksScreen } from './src/components/AiPicksScreen.jsx';
 import { BrowseScreen } from './src/components/BrowseScreen.jsx';
 import { GenrePicker } from './src/components/GenrePicker.jsx';
+import { HiddenScreen } from './src/components/HiddenScreen.jsx';
 import { MovieDetailModal } from './src/components/MovieDetailModal.jsx';
 import { ToWatchScreen } from './src/components/ToWatchScreen.jsx';
 import { useCardFlips } from './src/hooks/useCardFlips';
 import { useMovieBrowser } from './src/hooks/useMovieBrowser';
 import { useMovieLists } from './src/hooks/useMovieLists';
-import { recordTaste } from './src/lib/tasteProfile';
+import { forgetTaste, recordTaste } from './src/lib/tasteProfile';
 import { styles } from './src/styles';
 
 export default function App() {
@@ -56,6 +57,18 @@ export default function App() {
     const movie = movieHint || findMovie(id);
     if (movie) recordTaste(movie, 'disliked');
     movieLists.markRejected(id);
+  };
+
+  // Restoring a hidden movie also drops it from the AI taste cache, so an
+  // accidental tap doesn't keep shaping recommendations.
+  const handleUnhide = (id) => {
+    movieLists.unhideMovie(id);
+    forgetTaste(id);
+  };
+
+  const handleUnhideMany = (ids) => {
+    movieLists.unhideMovies(ids);
+    ids.forEach(forgetTaste);
   };
 
   return (
@@ -105,7 +118,7 @@ export default function App() {
           onRemoveFromToWatch={movieLists.removeFromToWatch}
           onOpenDetails={setDetailMovie}
         />
-      ) : (
+      ) : screen === 'aiPicks' ? (
         <AiPicksScreen
           watchlist={movieLists.toWatch}
           seenIds={movieLists.seen}
@@ -114,7 +127,15 @@ export default function App() {
           onAddToWatch={movieLists.addToWatch}
           onOpenDetails={setDetailMovie}
         />
-      )}
+      ) : screen === 'hidden' ? (
+        <HiddenScreen
+          seenIds={movieLists.seen}
+          rejectedIds={movieLists.rejected}
+          onUnhide={handleUnhide}
+          onUnhideMany={handleUnhideMany}
+          onOpenDetails={setDetailMovie}
+        />
+      ) : null}
 
       <AppMenu
         visible={menuOpen}

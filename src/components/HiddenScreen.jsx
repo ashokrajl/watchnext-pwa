@@ -164,7 +164,7 @@ export function HiddenScreen({ seenIds, rejectedIds, onUnhide, onUnhideMany, onO
             title="Skipped"
             entries={skipped}
             onRestoreAll={onUnhideMany}
-            onRestore={onRestore}
+            onRestore={onUnhide}
             onOpenDetails={onOpenDetails}
           />
           <Section
